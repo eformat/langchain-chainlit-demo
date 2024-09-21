@@ -35,10 +35,30 @@ spec:
           value: postgresql+psycopg://postgres:password@postgres:5432/vectordb
         image: image-registry.openshift-image-registry.svc:5000/openshift/chatbot:latest
         imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+            method: HEAD
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         name: chatbot
         ports:
         - containerPort: 8080
           protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+            method: HEAD
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
