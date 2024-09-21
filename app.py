@@ -12,14 +12,7 @@ from langchain_community.vectorstores import PGVector
 
 
 MODEL_NAME = os.getenv("MODEL_NAME", "Meta-Llama-3.1-8B-Instruct-Q5_K_M.gguf")
-MAX_TOKENS = int(os.getenv("MAX_TOKENS", 4096))
-PRESENCE_PENALTY = float(os.getenv("PRESENCE_PENALTY", 1.03))
-
 INFERENCE_SERVER_URL = os.getenv("INFERENCE_SERVER_URL", "http://localhost:8080/v1")
-TOP_K = int(os.getenv("TOP_K", 10))
-TOP_P = float(os.getenv("TOP_P", 0.95))
-TYPICAL_P = float(os.getenv("TYPICAL_P", 0.95))
-TEMPERATURE = float(os.getenv("TEMPERATURE", 0.2))
 
 DB_CONNECTION_STRING = os.getenv(
     "DB_CONNECTION_STRING",
@@ -47,32 +40,6 @@ if re.search(r"LLama-3", MODEL_NAME, flags=re.IGNORECASE):
 
 QA_CHAIN_PROMPT = PromptTemplate(input_variables=["question"], template=template)
 
-
-llm = ChatOpenAI(
-    openai_api_key="EMPTY",
-    openai_api_base=INFERENCE_SERVER_URL,
-    model_name=MODEL_NAME,
-    top_p=TOP_P,
-    temperature=TEMPERATURE,
-    max_tokens=MAX_TOKENS,
-    presence_penalty=PRESENCE_PENALTY,
-    streaming=True,
-    verbose=False,
-    # callbacks=[QueueCallback(q)],
-    http_async_client=httpx.AsyncClient(verify=False),
-    http_client=httpx.Client(verify=False),
-)
-
-# Document store: pgvector vector store
-embeddings = HuggingFaceEmbeddings()
-store = PGVector(
-    connection_string=DB_CONNECTION_STRING,
-    collection_name=DB_COLLECTION_NAME,
-    embedding_function=embeddings,
-    use_jsonb=True,
-)
-
-
 @cl.on_chat_start
 async def start_chat():
     cl.user_session.set(
@@ -82,7 +49,7 @@ async def start_chat():
     settings = await cl.ChatSettings(
         [
             Select(
-                id="model",
+                id="model_name",
                 label="OpenAI - Model",
                 values=["Meta-Llama-3.1-8B-Instruct-Q5_K_M.gguf"],
                 initial_index=0,
@@ -95,21 +62,46 @@ async def start_chat():
                 max=1,
                 step=0.1,
             ),
+            Slider(
+                id="top_p",
+                label="Top P",
+                initial=0.3,
+                min=0,
+                max=1,
+                step=0.1,
+            ),
+            Slider(
+                id="max_tokens",
+                label="Max output tokens",
+                initial=4096,
+                min=0,
+                max=131072,
+                step=512,
+            ),
+            Slider(
+                id="presence_penalty",
+                label="Presence Penalty",
+                initial=1.05,
+                min=-2,
+                max=2,
+                step=0.05,
+            ),
         ],
     ).send()
     cl.user_session.set("settings", settings)
 
-    llm_chain = RetrievalQA.from_chain_type(
-        llm,
-        retriever=store.as_retriever(search_type="similarity", search_kwargs={"k": 5}),
-        chain_type_kwargs={"prompt": QA_CHAIN_PROMPT},
-        return_source_documents=True,
-        verbose=True,
+    # memory=conversation_memory
+
+    # Document store: pgvector vector store
+    embeddings = HuggingFaceEmbeddings()
+    store = PGVector(
+        connection_string=DB_CONNECTION_STRING,
+        collection_name=DB_COLLECTION_NAME,
+        embedding_function=embeddings,
+        use_jsonb=True,
     )
+    cl.user_session.set("store", store)
 
-    # memory=conversation_memory)
-
-    cl.user_session.set("llm_chain", llm_chain)
 
 
 class StreamHandler(BaseCallbackHandler):
@@ -138,7 +130,30 @@ async def setup_agent(settings):
 @cl.on_message
 async def query_llm(message: cl.Message):
     settings = cl.user_session.get("settings")
-    llm_chain = cl.user_session.get("llm_chain")
+
+    llm = ChatOpenAI(
+        openai_api_key="EMPTY",
+        openai_api_base=INFERENCE_SERVER_URL,
+        model_name=settings["model_name"],
+        top_p=settings["top_p"],
+        temperature=settings["temperature"],
+        max_tokens=settings["max_tokens"],
+        presence_penalty=settings["presence_penalty"],
+        streaming=True,
+        verbose=False,
+        http_async_client=httpx.AsyncClient(verify=False),
+        http_client=httpx.Client(verify=False),
+    )
+
+    store = cl.user_session.get("store")
+
+    llm_chain = RetrievalQA.from_chain_type(
+        llm,
+        retriever=store.as_retriever(search_type="similarity", search_kwargs={"k": 5}),
+        chain_type_kwargs={"prompt": QA_CHAIN_PROMPT},
+        return_source_documents=True,
+        verbose=True,
+    )
 
     resp = await llm_chain.acall(
         message.content, callbacks=[cl.AsyncLangchainCallbackHandler(), StreamHandler()]
