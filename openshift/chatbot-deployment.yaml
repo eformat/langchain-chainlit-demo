@@ -34,7 +34,7 @@ spec:
         - name: DB_CONNECTION_STRING
           value: postgresql+psycopg://postgres:password@postgres:5432/vectordb
         image: image-registry.openshift-image-registry.svc:5000/openshift/chatbot:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3
           httpGet:
