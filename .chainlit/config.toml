@@ -54,7 +54,7 @@ edit_message = true
 
 [UI]
 # Name of the assistant.
-name = "developers.redhat.com"
+name = "developers_redhat_com"
 
 # Description of the assistant. This is used for HTML tags.
 # description = ""
