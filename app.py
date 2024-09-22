@@ -75,8 +75,8 @@ async def start_chat():
                 label="Max output tokens",
                 initial=4096,
                 min=0,
-                max=40960,
-                step=512,
+                max=32768,
+                step=256,
             ),
             Slider(
                 id="presence_penalty",
