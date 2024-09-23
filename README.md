@@ -1,6 +1,12 @@
 # chainlit
 
-Run locally
+Run locally (should work with python3.9+)
+
+```bash
+python3.12 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 Database
 
