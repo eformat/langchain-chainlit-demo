@@ -105,6 +105,15 @@ async def start_chat():
     cl.user_session.set("store", store)
 
 
+def remove_source_duplicates(input_list):
+    unique_list = []
+    unique_source = []
+    for item in input_list:
+        if item.metadata['source_documents'] not in unique_source:
+            unique_source.append(item.metadata['source_documents'])
+            unique_list.append(item)
+    return unique_list
+
 
 class StreamHandler(BaseCallbackHandler):
     def __init__(self):
@@ -160,12 +169,12 @@ async def query_llm(message: cl.Message):
     import pprint
     pprint.pprint(resp)
 
-    source_documents = resp["source_documents"]  # type: List[Document]
+    sources = remove_source_duplicates(resp['source_documents'])
     text_elements = []  # type: List[cl.Text]
     answer = ""
 
-    if source_documents:
-        for source_idx, source_doc in enumerate(source_documents):
+    if sources:
+        for source_idx, source_doc in enumerate(sources):
             source_name = f"source #{source_idx+1}"
             line = source_doc.metadata['source_documents']
             line = re.sub(r"/home/ec2-user/rag-multimodal/", "", line)
