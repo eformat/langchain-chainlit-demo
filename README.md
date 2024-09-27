@@ -33,4 +33,7 @@ Build image in OpenShift
 ```bash
 oc -n openshift new-build \
   --strategy docker --dockerfile - --name chatbot < Containerfile
+
+oc -n openshift new-build \
+  --strategy docker --dockerfile - --name chatbot-images < Containerfile.images
 ```
