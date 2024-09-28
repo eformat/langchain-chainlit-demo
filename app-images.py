@@ -109,9 +109,12 @@ def remove_source_duplicates(input_list):
     unique_list = []
     unique_source = []
     for item in input_list:
+        print(item.metadata['source_documents'])
         if item.metadata['source_documents'] not in unique_source:
             unique_source.append(item.metadata['source_documents'])
             unique_list.append(item)
+    
+    print(unique_list)
     return unique_list
 
 
@@ -154,7 +157,7 @@ async def query_llm(message: cl.Message):
 
     llm_chain = RetrievalQA.from_chain_type(
         llm,
-        retriever=store.as_retriever(search_type="similarity", search_kwargs={"k": 6}),
+        retriever=store.as_retriever(search_type="similarity", search_kwargs={"k": 8}),
         chain_type_kwargs={"prompt": QA_CHAIN_PROMPT},
         return_source_documents=True,
         verbose=True,
