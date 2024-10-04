@@ -30,7 +30,7 @@ spec:
       containers:
       - env:
         - name: INFERENCE_SERVER_URL
-          value: https://sno-llama31-cpp-predictor-llama-serving.apps.sno.sandbox1771.opentlc.com/v1
+          value: https://sno-llama31-cpp-predictor-llama-serving.apps.sno.sandbox1990.opentlc.com/v1
         - name: DB_CONNECTION_STRING
           value: postgresql+psycopg://postgres:password@postgres:5432/vectordb
         image: image-registry.openshift-image-registry.svc:5000/openshift/chatbot:latest
