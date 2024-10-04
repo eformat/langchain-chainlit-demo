@@ -1,4 +1,4 @@
-FROM quay.io/modh/cuda-notebooks@sha256:3beed917f90b12239d57cf49c864c6249236c8ffcafcc7eb06b0b55272ef5b55
+FROM quay.io/modh/cuda-notebooks@sha256:d8295bcf45a6a522f78c07dc62634a7775fc434621973bd81db243a5a63a1ffa
 WORKDIR /opt/app-root/src
 RUN git clone https://github.com/eformat/langchain-chainlit-demo.git
 RUN pip install --no-cache-dir -r langchain-chainlit-demo/requirements.txt
