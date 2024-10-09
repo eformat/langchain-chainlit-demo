@@ -1,0 +1,22 @@
+---
+namespace: quarkus-rag
+
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: Deployment
+      name: chatbot
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: chatbot
+      spec:
+        replicas: 1
+        template:
+          spec:
+            containers:
+              - name: chatbot
+                image: image-registry.openshift-image-registry.svc:5000/openshift/chatbot-quarkus:latest
