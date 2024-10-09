@@ -38,5 +38,5 @@ oc -n openshift new-build \
   --strategy docker --dockerfile - --name chatbot-images < Containerfile.images
 
 oc -n openshift new-build \
-  --strategy docker --dockerfile - --name chatbot-images < Containerfile.quarkus
+  --strategy docker --dockerfile - --name chatbot-quarkus < Containerfile.quarkus
 ```
