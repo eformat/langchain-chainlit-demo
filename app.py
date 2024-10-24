@@ -38,6 +38,22 @@ if re.search(r"LLama-3", MODEL_NAME, flags=re.IGNORECASE):
     <|start_header_id|>assistant<|end_header_id|>
     """
 
+elif re.search(r"granite-3.0-8b", MODEL_NAME, flags=re.IGNORECASE):
+    template = """
+    <|start_of_role|>system<|end_of_role|>
+    
+    You are a helpful, respectful and honest assistant answering questions named HatBot.
+    You will be given a question you need to answer, and a context to provide you with information. You must answer the question based as much as possible on this context.
+    Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
+    If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.<|end_of_text|><|start_of_role|>user<|end_of_role|>
+    Context:
+    {context}
+
+    Question: {question}<|end_of_text|>
+
+    <|start_of_role|>assistant<|end_of_role|>
+    """
+
 QA_CHAIN_PROMPT = PromptTemplate(input_variables=["question"], template=template)
 
 @cl.on_chat_start
@@ -51,8 +67,8 @@ async def start_chat():
             Select(
                 id="model_name",
                 label="OpenAI - Model",
-                values=["Meta-Llama-3.1-8B-Instruct-Q5_K_M.gguf"],
-                initial_index=0,
+                values=["Meta-Llama-3.1-8B-Instruct-Q8_0.gguf", "granite-3.0-8b-instruct"],
+                initial_index=1,
             ),
             Slider(
                 id="temperature",
@@ -73,7 +89,7 @@ async def start_chat():
             Slider(
                 id="max_tokens",
                 label="Max output tokens",
-                initial=4096,
+                initial=2048,
                 min=0,
                 max=32768,
                 step=256,
@@ -102,8 +118,6 @@ async def start_chat():
     )
     cl.user_session.set("store", store)
 
-
-
 class StreamHandler(BaseCallbackHandler):
     def __init__(self):
         self.msg = cl.Message(content="")
@@ -125,7 +139,6 @@ def remove_source_duplicates(input_list):
 @cl.on_settings_update
 async def setup_agent(settings):
     print("on_settings_update", settings)
-
 
 @cl.on_message
 async def query_llm(message: cl.Message):
