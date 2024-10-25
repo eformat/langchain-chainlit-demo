@@ -11,7 +11,7 @@ from langchain_openai import ChatOpenAI
 from langchain_community.vectorstores import PGVector
 
 
-MODEL_NAME = os.getenv("MODEL_NAME", "Meta-Llama-3.1-8B-Instruct-Q5_K_M.gguf")
+MODEL_NAME = os.getenv("MODEL_NAME", "Meta-Llama-3.1-8B-Instruct-Q8_0.gguf")
 INFERENCE_SERVER_URL = os.getenv("INFERENCE_SERVER_URL", "http://localhost:8080/v1")
 
 DB_CONNECTION_STRING = os.getenv(
