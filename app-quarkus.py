@@ -68,7 +68,7 @@ async def start_chat():
                 id="model_name",
                 label="OpenAI - Model",
                 values=["Meta-Llama-3.1-8B-Instruct-Q8_0.gguf", "granite-3.0-8b-instruct", "english-quotes", "java-code", "emojis"],
-                initial_index=1,
+                initial_index=0,
             ),
             Select(
                 id="collection_version",
