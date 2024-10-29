@@ -2,3 +2,6 @@ venv/
 __pycache__/
 images/
 chroma_db/
+*.html
+target/
+*~
