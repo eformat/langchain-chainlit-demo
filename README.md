@@ -40,3 +40,13 @@ oc -n openshift new-build \
 oc -n openshift new-build \
   --strategy docker --dockerfile - --name chatbot-quarkus < Containerfile.quarkus
 ```
+
+Build locally
+
+```bash
+podman build -t quay.io/eformat/chatbot:latest -f Containerfile
+
+podman build -t quay.io/eformat/chatbot-images:latest -f Containerfile.images
+
+podman build -t quay.io/eformat/chatbot-quarkus:latest -f Containerfile.quarkus
+```
