@@ -10,8 +10,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain_community.vectorstores import PGVector
 
-
-MODEL_NAME = os.getenv("MODEL_NAME", "Meta-Llama-3.1-8B-Instruct-Q8_0.gguf")
+MODEL_NAME = os.getenv("MODEL_NAME", "Llama-3.2-3B-Instruct-Q8_0.gguf")
 INFERENCE_SERVER_URL = os.getenv("INFERENCE_SERVER_URL", "http://localhost:8080/v1")
 
 DB_CONNECTION_STRING = os.getenv(
@@ -38,22 +37,6 @@ if re.search(r"LLama-3", MODEL_NAME, flags=re.IGNORECASE):
     <|start_header_id|>assistant<|end_header_id|>
     """
 
-elif re.search(r"granite-3.0-8b", MODEL_NAME, flags=re.IGNORECASE):
-    template = """
-    <|start_of_role|>system<|end_of_role|>
-    
-    You are a helpful, respectful and honest assistant answering questions named HatBot.
-    You will be given a question you need to answer, and a context to provide you with information. You must answer the question based as much as possible on this context.
-    Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
-    If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.<|end_of_text|><|start_of_role|>user<|end_of_role|>
-    Context:
-    {context}
-
-    Question: {question}<|end_of_text|>
-
-    <|start_of_role|>assistant<|end_of_role|>
-    """
-
 QA_CHAIN_PROMPT = PromptTemplate(input_variables=["question"], template=template)
 
 @cl.on_chat_start
@@ -67,8 +50,8 @@ async def start_chat():
             Select(
                 id="model_name",
                 label="OpenAI - Model",
-                values=["Meta-Llama-3.1-8B-Instruct-Q8_0.gguf", "Llama-3.2-3B-Instruct-Q8_0.gguf", "granite-3.0-8b-instruct", "english-quotes", "java-code", "emojis"],
-                initial_index=1,
+                values=["Llama-3.2-3B-Instruct-Q8_0.gguf"],
+                initial_index=0,
             ),
             Slider(
                 id="temperature",
@@ -105,8 +88,6 @@ async def start_chat():
         ],
     ).send()
     cl.user_session.set("settings", settings)
-
-    # memory=conversation_memory
 
     # Document store: pgvector vector store
     embeddings = HuggingFaceEmbeddings()
