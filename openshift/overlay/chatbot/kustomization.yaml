@@ -14,9 +14,18 @@ patches:
       metadata:
         name: chatbot
       spec:
-        replicas: 2
+        replicas: 1
         template:
           spec:
             containers:
               - name: chatbot
-                image: image-registry.openshift-image-registry.svc:5000/openshift/chatbot:latest
+                image: quay.io/eformat/chatbot:latest
+                env:
+                - name: INFERENCE_SERVER_URL
+                  value: http://sno-deepseek-qwen3-vllm-predictor.llama-serving.svc.cluster.local:8080/v1
+                - name: DB_CONNECTION_STRING
+                  value: postgresql+psycopg://postgres:password@postgres:5432/vectordb
+                - name: MODEL_LIST
+                  value: deepseek-r1-0528-qwen3-8b-bnb-4bit
+                - name: chatbot
+                  image: quay.io/eformat/chatbot:latest
