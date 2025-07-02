@@ -1,4 +1,5 @@
-FROM quay.io/modh/cuda-notebooks@sha256:d8295bcf45a6a522f78c07dc62634a7775fc434621973bd81db243a5a63a1ffa
+# 2025.1 - oc get is minimal-gpu -n redhat-ods-applications -o yaml
+FROM quay.io/modh/odh-workbench-jupyter-minimal-cuda-py311-ubi9@sha256:7b335c289a48e71a6fc149ead252b5a2dafeae730a5108adf9ba7ee12b181ca2
 WORKDIR /opt/app-root/src
 RUN git clone https://github.com/eformat/langchain-chainlit-demo.git
 RUN pip install --no-cache-dir -r langchain-chainlit-demo/requirements.txt

@@ -12,6 +12,7 @@ from langchain_community.vectorstores import PGVector
 
 
 MODEL_NAME = os.getenv("MODEL_NAME", "Meta-Llama-3.1-8B-Instruct-Q8_0.gguf")
+MODEL_LIST = os.getenv("MODEL_LIST", "DeepSeek-R1-0528-Qwen3-8B-Q4_K_M.gguf,Meta-Llama-3.1-8B-Instruct-Q8_0.gguf,Llama-3.2-3B-Instruct-Q8_0.gguf,granite-3.0-8b-instruct,english-quotes,java-code,emojis").split(",")
 INFERENCE_SERVER_URL = os.getenv("INFERENCE_SERVER_URL", "http://localhost:8080/v1")
 
 DB_CONNECTION_STRING = os.getenv(
@@ -67,8 +68,8 @@ async def start_chat():
             Select(
                 id="model_name",
                 label="OpenAI - Model",
-                values=["Meta-Llama-3.1-8B-Instruct-Q8_0.gguf", "Llama-3.2-3B-Instruct-Q8_0.gguf", "granite-3.0-8b-instruct", "english-quotes", "java-code", "emojis"],
-                initial_index=1,
+                values=MODEL_LIST,
+                initial_index=0,
             ),
             Slider(
                 id="temperature",
